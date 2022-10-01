@@ -5,6 +5,7 @@
 {% block title %}{{ phone.name }}{% endblock %}
 
 {% block content %}
+{% for phone in phones %}
   <div class="container">
   <div class="header">
     <h5>
@@ -19,4 +20,5 @@
     <div>Дата выпуска: {{ phone.release_date }}</div>
     <div>LTE: {{ phone.lte_exists|yesno:'есть,нет' }}</div>
   </div>
+{% endfor %}
 {% endblock %}
