@@ -3,18 +3,13 @@ from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
 from .models import Article, Scope, Tag
 
-# С проверкой заполнения 'is_main' не понял как реализовывать
 class ScopeInlineFormset(BaseInlineFormSet):
     def clean(self):
         for form in self.forms:
-            # В form.cleaned_data будет словарь с данными
-            # каждой отдельной формы, которые вы можете проверить
-            form.cleaned_data            
-            # вызовом исключения ValidationError можно указать админке о наличие ошибки
-            # таким образом объект не будет сохранен,
-            # а пользователю выведется соответствующее сообщение об ошибке
+            if form.cleaned_data.get('is_main'):
+                return super().clean() 
             raise ValidationError('Укажите основной раздел')
-        return super().clean()  # вызываем базовый код переопределяемого метода
+        return super().clean() 
 
 class ScopeInline(admin.TabularInline):
     model = Scope
