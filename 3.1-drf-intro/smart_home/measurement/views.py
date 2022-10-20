@@ -16,20 +16,21 @@ class SensorsView(ListAPIView):
     def post(self, request):
 
         Sensor.objects.create(name = request.data['name'], description = request.data['description'])
-        return Response({'status': 'OK'})
+        return Response({'Response': 'OK'})
 
 
 class SensorDetailView(RetrieveAPIView):
     queryset = Sensor.objects.all()
     serializer_class = SensorDetailSerializer
 
-    def patch(self, request):
-        return Response({'status': 'OK'})
+    def patch(self, request, pk):
+        Sensor.objects.filter(id = pk).update(description = request.data['description'])
+        return Response({'Response': 'OK'})
 
 class MeasurementAdd(ListAPIView):
     queryset = Sensor.objects.all()
     serializer_class = SensorDetailSerializer
 
-    def post(self, request):
-        Measurement.objects.create(sensor = request.data['sensor'], temperature = request.data['temperature'])
-        return Response({'status': 'OK'})
+    def post(self, request): 
+        Measurement.objects.create(sensor_id = request.data['sensor'], temperature = request.data['temperature'])
+        return Response({'Response': 'OK'})

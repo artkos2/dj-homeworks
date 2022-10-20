@@ -13,8 +13,8 @@ POST {{baseUrl}}/sensors/
 Content-Type: application/json
 
 {
-  "name": "ESP3sdf2",
-  "description": "Датчsdfsdfик на кухне за холодильником"
+  "name": "со2",
+  "description": "Дкухне за холодильником"
 }
 
 ###
@@ -24,7 +24,7 @@ PATCH {{baseUrl}}/sensors/1/
 Content-Type: application/json
 
 {
-  "description": "Перенес датчик на балкон"
+  "description": "Перенес датчик wdfc "
 }
 
 ###
@@ -34,7 +34,7 @@ POST {{baseUrl}}/measurements/
 Content-Type: application/json
 
 {
-  "sensor": 1,
+  "sensor": 4,
   "temperature": 22
 }
 
