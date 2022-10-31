@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from advertisements.models import Advertisement
+from .models import Advertisement
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,6 +24,7 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         model = Advertisement
         fields = ('id', 'title', 'description', 'creator',
                   'status', 'created_at', )
+        read_only_fields = ['user',]
 
     def create(self, validated_data):
         """Метод для создания"""
@@ -36,6 +37,9 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         # само поле при этом объявляется как `read_only=True`
         validated_data["creator"] = self.context["request"].user
         return super().create(validated_data)
+
+    # def update(self, serializer):
+    #     serializer.save(user=self.context["request"].user)
 
     def validate(self, data):
         """Метод для валидации. Вызывается при создании и обновлении."""
