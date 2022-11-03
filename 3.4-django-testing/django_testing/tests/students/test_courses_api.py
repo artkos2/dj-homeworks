@@ -10,16 +10,19 @@ from students.models import Student, Course
 def client():
     return APIClient()
 
+@pytest.fixture
+def student():
+    return Student.objects.create(name = 'Student1')
 
 @pytest.fixture
-def message_factory_student():
+def student_factory():
     def factory(*args, **kwargs):
         return baker.make(Student, *args, **kwargs)
 
     return factory
 
 @pytest.fixture
-def message_factory_course():
+def course_factory():
     def factory(*args, **kwargs):
         return baker.make(Course, *args, **kwargs)
 
@@ -27,30 +30,36 @@ def message_factory_course():
 
 
 @pytest.mark.django_db
-def test_create_course(client):
-    # Arrange
+def test_create_course(client, student):
     count = Course.objects.count()
-    response = client.post('/messages/', data={'name': user.id, 'students': 'test text'})
 
-    # Act
-    response = client.get('/messages/')
+    response = client.post('/api/v1/courses/', data={'student': student.id, 'name': 'test name'})
 
-    # Assert
     assert response.status_code == 201
     assert Course.objects.count() == count + 1
 
+# @pytest.mark.django_db
+# def test_update_course(client, student, course_factory):
+#     сourse = course_factory(_quantity=5)
+
+#     response = client.patch('/api/v1/courses/', data={'student': student.id, 'name': 'test name2'})
+#     assert response.status_code == 201
+#     data = response.json()
+#     assert len(data) == len(сourse)
+#     for i, m in enumerate(data):
+#         assert m['name'] == сourse[i].name
 
 @pytest.mark.django_db
-def test_create_message(client, user):
-    count = Message.objects.count()
+def test_delete_course(client, student):
 
-    response = client.post('/messages/', data={'user': user.id, 'text': 'test text'})
-
+    response = client.post('/api/v1/courses/', data={'student': student.id, 'name': 'test name'})
     assert response.status_code == 201
-    assert Message.objects.count() == count + 1
-
-
-
+    # count = Course.objects.count()
+    
+    id = Course.objects.first()
+    response = client.patch('/api/v1/courses/', data={'name': 'test name2'}, format = 'json')
+    assert response.status_code == 201
+    # assert Course.objects.count() == count - 1
 
 
     # проверка получения 1го курса (retrieve-логика)
@@ -62,8 +71,7 @@ def test_create_message(client, user):
     # проверка фильтрации списка курсов по id
     # создаем курсы через фабрику, передать id одного курса в фильтр, проверить результат запроса с фильтром
     # проверка фильтрации списка курсов по name
-    # тест успешного создания курса
-    # здесь фабрика не нужна, готовим JSON-данные и создаем курс
+
     # тест успешного обновления курса
     # сначала через фабрику создаем, потом обновляем JSON-данными
     # тест успешного удаления курса
