@@ -1,14 +1,16 @@
-from django_filters import FilterSet, DateFromToRangeFilter
-from django.contrib.auth.models import User
+from django_filters import rest_framework as filters
 
 from advertisements.models import Advertisement
 
 
-class AdvertisementFilter(FilterSet):
+class AdvertisementFilter(filters.FilterSet):
     """Фильтры для объявлений."""
-
-    date = DateFromToRangeFilter(field_name='created_at')
+    created_at = filters.DateFromToRangeFilter()
 
     class Meta:
         model = Advertisement
-        fields = ['date', 'creator', 'status']
+        fields = [
+            'created_at',
+            'creator',
+            'status',
+        ]

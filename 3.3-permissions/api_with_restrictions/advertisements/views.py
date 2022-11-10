@@ -4,7 +4,6 @@ from advertisements.models import Advertisement
 from .serializers import AdvertisementSerializer
 from .permissions import IsOwner
 from .filters import AdvertisementFilter
-from django_filters import rest_framework
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -18,6 +17,6 @@ class AdvertisementViewSet(ModelViewSet):
 
     def get_permissions(self):
         """Получение прав для действий."""
-        if self.action in ["create", "delete", "update", "partial_update"]:
+        if self.action in ["create", "destroy", "update", "partial_update"]:
             return [IsAuthenticated(), IsOwner()]
         return []

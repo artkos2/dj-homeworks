@@ -21,9 +21,9 @@ Authorization: Token 1e1552a3fccf36eba963cc84d522992ce94e2d02
 ###
 
 # попытка поменять объявление
-PATCH {{baseUrl}}/advertisements/15/
+PATCH {{baseUrl}}/advertisements/8/
 Content-Type: application/json
-Authorization: Token bc95b921e6ac7b1a7661827ce14a5a59819d207c
+Authorization: Token 1e1552a3fccf36eba963cc84d522992ce94e2d02
 
 {
   "status": "CLOSED"
@@ -32,7 +32,7 @@ Authorization: Token bc95b921e6ac7b1a7661827ce14a5a59819d207c
 ###
 
 # фильтрация по создателю
-GET {{baseUrl}}/advertisements/?creator=3
+GET {{baseUrl}}/advertisements/?creator=2
 Content-Type: application/json
 
 ###
