@@ -15,63 +15,89 @@ def student():
     return Student.objects.create(name = 'Student1')
 
 @pytest.fixture
-def student_factory():
+def students_factory():
     def factory(*args, **kwargs):
         return baker.make(Student, *args, **kwargs)
-
     return factory
 
 @pytest.fixture
-def course_factory():
+def courses_factory():
     def factory(*args, **kwargs):
         return baker.make(Course, *args, **kwargs)
-
     return factory
-
 
 @pytest.mark.django_db
 def test_create_course(client, student):
     count = Course.objects.count()
-
-    response = client.post('/api/v1/courses/', data={'student': student.id, 'name': 'test name'})
+    response = client.post('/api/v1/courses/', data={'student': student.id, 'name': 'test course'})
 
     assert response.status_code == 201
     assert Course.objects.count() == count + 1
 
-# @pytest.mark.django_db
-# def test_update_course(client, student, course_factory):
-#     сourse = course_factory(_quantity=5)
+@pytest.mark.django_db
+def test_patch_course(client, courses_factory, students_factory):
+    students = students_factory(_quantity=1)
+    courses = courses_factory(_quantity=1, students=students)
 
-#     response = client.patch('/api/v1/courses/', data={'student': student.id, 'name': 'test name2'})
-#     assert response.status_code == 201
-#     data = response.json()
-#     assert len(data) == len(сourse)
-#     for i, m in enumerate(data):
-#         assert m['name'] == сourse[i].name
+    response = client.patch(f'/api/v1/courses/{courses[0].id}/', data={'name': 'Rename'})
+    data = response.json()
+    
+    assert response.status_code == 200
+    assert data['name'] == 'Rename'
 
 @pytest.mark.django_db
-def test_delete_course(client, student):
+def test_delete_course(client, courses_factory, students_factory):
+    students = students_factory(_quantity=1)
+    courses = courses_factory(_quantity=1, students=students)
+    count = Course.objects.count()
 
-    response = client.post('/api/v1/courses/', data={'student': student.id, 'name': 'test name'})
-    assert response.status_code == 201
-    # count = Course.objects.count()
-    
-    id = Course.objects.first()
-    response = client.patch('/api/v1/courses/', data={'name': 'test name2'}, format = 'json')
-    assert response.status_code == 201
-    # assert Course.objects.count() == count - 1
+    response = client.delete(f'/api/v1/courses/{courses[0].id}/')
 
+    assert response.status_code == 204
+    assert Course.objects.count() == count -1
 
-    # проверка получения 1го курса (retrieve-логика)
-    # создаем курс через фабрику
-    # строим урл и делаем запрос через тестовый клиент
-    # проверяем, что вернулся именно тот курс, который запрашивали
-    # проверка получения списка курсов (list-логика)
-    # аналогично – сначала вызываем фабрики, затем делаем запрос и проверяем результат
-    # проверка фильтрации списка курсов по id
-    # создаем курсы через фабрику, передать id одного курса в фильтр, проверить результат запроса с фильтром
-    # проверка фильтрации списка курсов по name
+@pytest.mark.django_db
+def test_get_course(client, students_factory, courses_factory):
+    students = students_factory(_quantity=1)
+    courses = courses_factory(_quantity=1, students=students)
 
-    # тест успешного обновления курса
-    # сначала через фабрику создаем, потом обновляем JSON-данными
-    # тест успешного удаления курса
+    response = client.get(f'/api/v1/courses/{courses[0].id}/')
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data['name'] == courses[0].name
+
+@pytest.mark.django_db
+def test_get_lis_course(client, students_factory, courses_factory):
+    students = students_factory(_quantity=10)
+    courses = courses_factory(_quantity=1, students=students)
+
+    response = client.get(f'/api/v1/courses/')
+    data = response.json()
+
+    assert response.status_code == 200
+    assert len(courses) == len(data)
+    for i, c in enumerate(data):
+        assert c['id'] == courses[i].id   
+
+@pytest.mark.django_db
+def test_filter_id(client, students_factory, courses_factory):
+    students = students_factory(_quantity=2)
+    courses = courses_factory(_quantity=2, students=students)
+
+    response = client.get(f'/api/v1/courses/?id={courses[1].id}')
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data[1]['id'] == courses[1].id
+
+@pytest.mark.django_db
+def test_filter_name(client, students_factory, courses_factory):
+    students = students_factory(_quantity=5)
+    courses = courses_factory(_quantity=5, students=students)
+
+    response = client.get(f'/api/v1/courses/?name={courses[4].name}')
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data[4]['name'] == courses[4].name
