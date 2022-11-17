@@ -71,6 +71,10 @@ class AdvertisementSerializer(serializers.ModelSerializer):
                   'status', 'created_at', )
 
     def create(self, validated_data):
+        return super().create(validated_data)
+        
+
+    def validate(self, validated_data):
         request = self.context['request'].method
         user = self.context['request'].user
         if len(Advertisement.objects.filter(creator=user, status='OPEN')) > 9:
@@ -79,10 +83,5 @@ class AdvertisementSerializer(serializers.ModelSerializer):
                 and Advertisement.objects.filter(creator=user, status='OPEN').count() > 9:
             raise ValidationError('Разрешено не более 10 открытых объявлений')
         validated_data["creator"] = user
-        return super().create(validated_data)
-        
 
-    def validate(self, data):
-        """Метод для валидации. Вызывается при создании и обновлении."""
-
-        return data
+        return validated_data
